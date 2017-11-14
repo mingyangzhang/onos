@@ -69,6 +69,7 @@
         <module>openstacknode</module>
         <module>openstacknetworking</module>
         <module>openstackinterface</module>
+        <module>hello</module>
   </modules>
 
     <properties>
