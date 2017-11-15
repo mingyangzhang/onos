@@ -6,6 +6,7 @@ import org.apache.felix.scr.annotations.Deactivate;
 import org.onosproject.core.ApplicationId;
 import org.onosproject.core.CoreService;
 import org.osgi.service.component.ComponentContext;
+import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.ReferenceCardinality;
 import org.onosproject.net.packet.PacketContext;
 
@@ -19,8 +20,7 @@ import static org.slf4j.LoggerFactory.getLogger;
  *
  */
 @Component(immediate = true)
-public class Hello 
-{
+public class Hello {
     private final Logger log = getLogger(getClass());
     @Reference(cardinality = ReferenceCardinality.MANDATORY_UNARY)
     protected PacketService packetService;
