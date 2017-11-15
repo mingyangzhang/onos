@@ -69,7 +69,7 @@
         <module>openstacknode</module>
         <module>openstacknetworking</module>
         <module>openstackinterface</module>
-        <module>hello</module>
+        <module>onos-app-hello</module>
   </modules>
 
     <properties>
