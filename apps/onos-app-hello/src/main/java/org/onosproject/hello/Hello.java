@@ -5,6 +5,9 @@ import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Deactivate;
 import org.onosproject.core.ApplicationId;
 import org.onosproject.core.CoreService;
+import org.osgi.service.component.ComponentContext;
+import org.apache.felix.scr.annotations.ReferenceCardinality;
+import org.onosproject.net.packet.PacketContext;
 
 import org.onosproject.net.packet.PacketProcessor;
 import org.onosproject.net.packet.PacketService;
