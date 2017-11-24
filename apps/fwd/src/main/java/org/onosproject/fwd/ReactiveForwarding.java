@@ -563,12 +563,6 @@ public class ReactiveForwarding {
             selectorBuilder.matchEthType(Ethernet.TYPE_IPV4)
                     .matchIPSrc(matchIp4SrcPrefix)
                     .matchIPDst(matchIp4DstPrefix);
-
-            if (matchIpv4Dscp) {
-                byte dscp = ipv4Packet.getDscp();
-                byte ecn = ipv4Packet.getEcn();
-                selectorBuilder.matchIPDscp(dscp).matchIPEcn(ecn);
-            }
         }
 
         TrafficTreatment treatment = DefaultTrafficTreatment.builder()
