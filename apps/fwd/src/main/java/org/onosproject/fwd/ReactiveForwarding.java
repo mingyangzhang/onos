@@ -24,7 +24,17 @@ import org.apache.felix.scr.annotations.Property;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.ReferenceCardinality;
 import org.onlab.packet.Ethernet;
+import org.onlab.packet.ICMP;
+import org.onlab.packet.ICMP6;
+import org.onlab.packet.IPv4;
+import org.onlab.packet.IPv6;
+import org.onlab.packet.Ip4Prefix;
+import org.onlab.packet.Ip6Prefix;
 import org.onlab.packet.MacAddress;
+import org.onlab.packet.TCP;
+import org.onlab.packet.TpPort;
+import org.onlab.packet.UDP;
+import org.onlab.packet.VlanId;
 import org.onlab.util.Tools;
 import org.onosproject.cfg.ComponentConfigService;
 import org.onosproject.core.ApplicationId;
@@ -541,7 +551,34 @@ public class ReactiveForwarding {
         // Else
         //    Create flows with default matching and include configured fields
         //
-        selectorBuilder.matchInPort(context.inPacket().receivedFrom().port());
+        selectorBuilder.matchInPort(context.inPacket().receivedFrom().port())
+                .matchEthSrc(inPkt.getSourceMAC())
+                .matchEthDst(inPkt.getDestinationMAC());
+
+        //
+        // If configured and EtherType is IPv4 - Match IPv4 and
+        // TCP/UDP/ICMP fields
+        //
+        if (matchIpv4Address && inPkt.getEtherType() == Ethernet.TYPE_IPV4) {
+            IPv4 ipv4Packet = (IPv4) inPkt.getPayload();
+            byte ipv4Protocol = ipv4Packet.getProtocol();
+            Ip4Prefix matchIp4SrcPrefix =
+                    Ip4Prefix.valueOf(ipv4Packet.getSourceAddress(),
+                                      Ip4Prefix.MAX_MASK_LENGTH);
+            Ip4Prefix matchIp4DstPrefix =
+                    Ip4Prefix.valueOf(ipv4Packet.getDestinationAddress(),
+                                      Ip4Prefix.MAX_MASK_LENGTH);
+            selectorBuilder.matchEthType(Ethernet.TYPE_IPV4)
+                    .matchIPSrc(matchIp4SrcPrefix)
+                    .matchIPDst(matchIp4DstPrefix);
+
+            if (matchIpv4Dscp) {
+                byte dscp = ipv4Packet.getDscp();
+                byte ecn = ipv4Packet.getEcn();
+                selectorBuilder.matchIPDscp(dscp).matchIPEcn(ecn);
+            }
+        }
+
         TrafficTreatment treatment = DefaultTrafficTreatment.builder()
                 .setOutput(portNumber)
                 .build();
