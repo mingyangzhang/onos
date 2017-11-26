@@ -403,10 +403,6 @@ public class ReactiveForwarding {
             // Stop processing if the packet has been handled, since we
             // can't do any more to it.
             log.info("packet in received");
-            if (context.isHandled()) {
-                log.info("quit: context is Handled");
-                return;
-            }
 
             InboundPacket pkt = context.inPacket();
             Ethernet ethPkt = pkt.parsed();
@@ -544,9 +540,8 @@ public class ReactiveForwarding {
         TrafficSelector.Builder selectorBuilder = DefaultTrafficSelector.builder();
 
         // If PacketOutOnly or ARP packet than forward directly to output port
-        if (packetOutOnly || inPkt.getEtherType() == Ethernet.TYPE_ARP) {
+        if (packetOutOnly) {
             packetOut(context, portNumber);
-            log.info("quit: arp");
             return;
         }
 
