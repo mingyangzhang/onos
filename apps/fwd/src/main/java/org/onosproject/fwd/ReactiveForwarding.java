@@ -404,6 +404,7 @@ public class ReactiveForwarding {
             // can't do any more to it.
             log.info("packet in received");
             if (context.isHandled()) {
+                log.info("quit: context is Handled");
                 return;
             }
 
@@ -545,6 +546,7 @@ public class ReactiveForwarding {
         // If PacketOutOnly or ARP packet than forward directly to output port
         if (packetOutOnly || inPkt.getEtherType() == Ethernet.TYPE_ARP) {
             packetOut(context, portNumber);
+            log.info("quit: arp");
             return;
         }
 
