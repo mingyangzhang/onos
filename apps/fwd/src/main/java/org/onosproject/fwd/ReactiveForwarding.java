@@ -456,8 +456,7 @@ public class ReactiveForwarding {
             if (pkt.receivedFrom().deviceId().equals(dst.location().deviceId())) {
                 if (!context.inPacket().receivedFrom().port().equals(dst.location().port())) {
                     installRule(context, dst.location().port());
-                }
-                else {
+                } else {
                     log.info("quit: edge switch");
                 }
                 return;
