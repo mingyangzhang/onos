@@ -402,7 +402,7 @@ public class ReactiveForwarding {
         public void process(PacketContext context) {
             // Stop processing if the packet has been handled, since we
             // can't do any more to it.
-
+            log.info("packet in received");
             if (context.isHandled()) {
                 return;
             }
@@ -411,16 +411,19 @@ public class ReactiveForwarding {
             Ethernet ethPkt = pkt.parsed();
 
             if (ethPkt == null) {
+                log.info("quit: ethPkt null");
                 return;
             }
 
             // Bail if this is deemed to be a control packet.
             if (isControlPacket(ethPkt)) {
+                log.info("quit:  controller pkt");
                 return;
             }
 
             // Skip IPv6 multicast packet when IPv6 forward is disabled.
             if (!ipv6Forwarding && isIpv6Multicast(ethPkt)) {
+                log.info("quit: ipv6");
                 return;
             }
 
@@ -428,12 +431,14 @@ public class ReactiveForwarding {
 
             // Do not process link-local addresses in any way.
             if (id.mac().isLinkLocal()) {
+                log.info("quit: local");
                 return;
             }
 
             // Do not process IPv4 multicast packets, let mfwd handle them
             if (ignoreIpv4McastPackets && ethPkt.getEtherType() == Ethernet.TYPE_IPV4) {
                 if (id.mac().isMulticast()) {
+                    log.info("quit: multicast");
                     return;
                 }
             }
@@ -442,6 +447,7 @@ public class ReactiveForwarding {
             Host dst = hostService.getHost(id);
             if (dst == null) {
                 flood(context);
+                log.info("quit: flood");
                 return;
             }
 
@@ -450,6 +456,9 @@ public class ReactiveForwarding {
             if (pkt.receivedFrom().deviceId().equals(dst.location().deviceId())) {
                 if (!context.inPacket().receivedFrom().port().equals(dst.location().port())) {
                     installRule(context, dst.location().port());
+                }
+                else {
+                    log.info("quit: edge switch");
                 }
                 return;
             }
@@ -463,6 +472,7 @@ public class ReactiveForwarding {
             if (paths.isEmpty()) {
                 // If there are no paths, flood and bail.
                 flood(context);
+                log.info("quit: path isEmpty");
                 return;
             }
 
@@ -473,6 +483,7 @@ public class ReactiveForwarding {
                 log.warn("Don't know where to go from here {} for {} -> {}",
                          pkt.receivedFrom(), ethPkt.getSourceMAC(), ethPkt.getDestinationMAC());
                 flood(context);
+                log.info("quit: flood and no path");
                 return;
             }
 
@@ -528,6 +539,7 @@ public class ReactiveForwarding {
         // We don't support (yet) buffer IDs in the Flow Service so
         // packet out first.
         //
+        log.info("send out flow mod");
         Ethernet inPkt = context.inPacket().parsed();
         TrafficSelector.Builder selectorBuilder = DefaultTrafficSelector.builder();
 
